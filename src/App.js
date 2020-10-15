@@ -1,5 +1,5 @@
 // Peinemann.nl
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, NavLink } from "react-router-dom";
 import React from "react";
 import "./App.css";
 import AboutPage from "./pages/AboutPage";
@@ -10,8 +10,18 @@ function App() {
   return (
     <div className="App">
       <nav>
-        <Link to="discover">Discover Movies</Link>;
-        <Link to="/about">About this page</Link>;<Link to="/">Homepage</Link>;
+        <li>
+          <NavLink to="/" exact={true}>
+            Homepage
+          </NavLink>
+          ;
+        </li>
+        <li>
+          <NavLink to="discover">Discover Movies</NavLink>;
+        </li>
+        <li>
+          <NavLink to="/about">About this page</NavLink>;
+        </li>
       </nav>
       <Switch>
         <Route path="/discover" component={DiscoverMoviesPage} />
