@@ -1,4 +1,5 @@
 // Peinemann.nl
+import axios from "axios";
 import { Switch, Route, NavLink } from "react-router-dom";
 import React from "react";
 import "./App.css";
