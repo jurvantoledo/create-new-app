@@ -4,47 +4,51 @@ import axios from "axios";
 
 export default function DiscoverMoviesPage() {
   const params = useParams();
-  const history = useHistory();
-  const [searchText, set_searchText] = useState(params.query || "");
+  const [searchText, set_searchText] = useState();
   const [movies, setMovies] = useState({ status: "idle", data: [] });
-
-  function search() {
-    console.log(searchText);
-    history.push(`/discover/${searchText}`);
-  }
+  const history = useHistory();
 
   useEffect(() => {
-    if (params.query === undefined || params.query === "") {
-      return;
-    }
     async function fetchData() {
-      setMovies({ status: "loading", data: [] });
       try {
         const response = await axios.get(
-          `http://www.omdbapi.com/?i=${params.query}&apikey=a62d4167`
+          `http://www.omdbapi.com/?s=${params.searchtext}&y=2018&apikey=a7462395`
         );
-        console.log("Success!", response.data);
-        if (response.data.Response === false) {
+
+        console.log(response.data);
+        if (response.data.Response === "False") {
           setMovies({
-            status: "Error",
+            status: "error",
             data: [],
             message: response.data.Error,
           });
         } else {
-          setMovies({ status: "Succes!", message: response.data.Search });
+          setMovies({ status: "success", data: response.data.Search });
         }
       } catch (error) {
-        setMovies({ status: "Error", data: [], message: error.message });
+        setMovies({
+          status: "error",
+          data: [],
+          message: error.message,
+        });
       }
+      set_searchText(params.searchtext);
     }
-    set_searchText(params.query);
-
     fetchData();
-  }, [params.imdbID]);
+  }, [params.searchtext]);
+
+  const search = () => {
+    const routeParam = encodeURIComponent(
+      { status: "loading", data: [] },
+      searchText
+    );
+    history.push(`/discover/${routeParam}`);
+  };
 
   return (
     <div>
       <h1>Discover some movies!</h1>
+      <div>{movies.status === "error" ? movies.message : movies.status}</div>
       <p>
         <input
           value={searchText}
@@ -68,5 +72,3 @@ export default function DiscoverMoviesPage() {
     </div>
   );
 }
-
-/* */
