@@ -1,24 +1,46 @@
-import React, { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 
 export default function DiscoverMoviesPage() {
-  const [searchText, set_searchText] = useState("");
-  const [movies, setMovies] = useState({ status: "idle", data: [] });
+  const params = useParams();
   const history = useHistory();
+  const [searchText, set_searchText] = useState(params.query || "");
+  const [movies, setMovies] = useState({ status: "idle", data: [] });
 
-  const search = async () => {
-    console.log("Start searching for:", searchText, { status: "searching" });
+  function search() {
+    console.log(searchText);
+    history.push(`/discover/${searchText}`);
+  }
 
-    const queryParam = encodeURIComponent(searchText);
+  useEffect(() => {
+    if (params.query === undefined || params.query === "") {
+      return;
+    }
+    async function fetchData() {
+      setMovies({ status: "loading", data: [] });
+      try {
+        const response = await axios.get(
+          `http://www.omdbapi.com/?i=${params.query}&apikey=a62d4167`
+        );
+        console.log("Success!", response.data);
+        if (response.data.Response === false) {
+          setMovies({
+            status: "Error",
+            data: [],
+            message: response.data.Error,
+          });
+        } else {
+          setMovies({ status: "Succes!", message: response.data.Search });
+        }
+      } catch (error) {
+        setMovies({ status: "Error", data: [], message: error.message });
+      }
+    }
+    set_searchText(params.query);
 
-    const response = await axios.get(
-      `http://www.omdbapi.com/?i=tt3896198&apikey=a62d4167&s=${queryParam}`
-    );
-
-    console.log("Success!", response.data.Search);
-    setMovies({ status: "done", data: response.data.Search });
-  };
+    fetchData();
+  }, [params.imdbID]);
 
   return (
     <div>
