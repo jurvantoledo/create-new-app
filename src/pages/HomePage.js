@@ -1,5 +1,5 @@
 import React from "react";
 
 export default function HomePage(props) {
-  return [props.HomePage];
+  return <React.StrictMode>{props.Homepage}</React.StrictMode>;
 }

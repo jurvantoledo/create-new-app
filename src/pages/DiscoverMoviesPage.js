@@ -1,20 +1,23 @@
 import React, { useState } from "react";
+import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 
 export default function DiscoverMoviesPage() {
   const [searchText, set_searchText] = useState("");
+  const [movies, setMovies] = useState({ status: "idle", data: [] });
+  const history = useHistory();
 
   const search = async () => {
-    console.log("TODO search movies for:", searchText);
-    // Best practice: encode the string so that special characters
-    //  like '&' and '?' don't accidentally mess up the URL
+    console.log("Start searching for:", searchText, { status: "searching" });
+
     const queryParam = encodeURIComponent(searchText);
 
-    const data = await axios.get(
-      `http://www.omdbapi.com/?i=tt3896198&apikey=a62d4167${queryParam}`
+    const response = await axios.get(
+      `http://www.omdbapi.com/?i=tt3896198&apikey=a62d4167&s=${queryParam}`
     );
 
-    console.log("Succes", data);
+    console.log("Success!", response.data.Search);
+    setMovies({ status: "done", data: response.data.Search });
   };
 
   return (
@@ -27,6 +30,21 @@ export default function DiscoverMoviesPage() {
         />
         <button onClick={search}>Search</button>
       </p>
+      <div>
+        {movies.data.map((movie) => {
+          console.log(movie);
+          return (
+            <div key={movie.imdbID}>
+              <Link to={`/movies/${movie.imdbID}`}>
+                <h3>{movie.Title}</h3>
+              </Link>
+              <img src={movie.Poster} alt={movie.Title} />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
+
+/* */
